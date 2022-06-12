@@ -2,7 +2,7 @@
 #Google API Key
 from __future__ import division
 import os
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "../decent-lambda-352910-86fe91bb705c.json"
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "decent-lambda-352910-86fe91bb705c.json"
 import re
 import sys
 from google.cloud import speech

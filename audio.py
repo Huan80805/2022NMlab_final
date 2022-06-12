@@ -9,10 +9,9 @@ import librosa
 import pyaudio as pa
 import numpy as np
 from gtts import gTTS
-from mutealsa import noalsaerr
+from utils import mutealsa
 import sys
 import wave
-
 np.set_printoptions(threshold=sys.maxsize)
 
                 
@@ -31,7 +30,7 @@ class AudioInput:
     """
     def __init__(self, device, sample_rate=16000, chunk_size=1600):
         self.stream = None
-        with noalsaerr():
+        with mutealsa():
             self.interface = pa.PyAudio()
         self.device_info = find_audio_device(device, self.interface)
         self.device_id = self.device_info['index']
@@ -118,7 +117,7 @@ class AudioInput:
         # RECORED 10s AND SAVE AS "test.wav"
         record_seconds = 10
         frames = []
-        for i in range(0, int(self.device_sample_rate / self.chunk_size * record_seconds)):
+        for i in range(0, int(self.sample_rate / self.chunk_size * record_seconds)):
             data = self.buff.get()
             frames.append(data)
 
@@ -128,7 +127,7 @@ class AudioInput:
         wf = wave.open("test.wav", 'wb')
         wf.setnchannels(1)
         wf.setsampwidth(self.interface.get_sample_size(pa.paInt16))
-        wf.setframerate(self.device_sample_rate)
+        wf.setframerate(self.sample_rate)
         wf.writeframes(b''.join(frames))
         wf.close()
 

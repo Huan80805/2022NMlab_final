@@ -10,3 +10,8 @@ pyaudio
 llvmlite
 # https://blog.csdn.net/Whale__a/article/details/114837594
 librosa
+pydub
+pafy=0.5.5
+#youtube dislike error
+#pip install git+https://github.com/Cupcakus/pafy
+youtube-search-python
