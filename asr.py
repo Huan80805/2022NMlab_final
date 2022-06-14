@@ -58,11 +58,11 @@ def listen_print_loop(responses):
 
 
 class Hearing():
-    def __init__(self, device, sample_rate, chunk_size):
+    def __init__(self, device, sample_rate, chunk_size, language='zh-TW'):
         self.stream = AudioInput(device, sample_rate, chunk_size)
         # See http://g.co/cloud/speech/docs/languages
         # for a list of supported languages.
-        self.language_code = "en-US"  # a BCP-47 language tag
+        self.language_code = language  # a BCP-47 language tag
         #TODO change sample rate to interface's sample rate
         self.client = speech.SpeechClient()
         config = speech.RecognitionConfig(

@@ -3,6 +3,13 @@ from contextlib import contextmanager
 from youtubesearchpython import VideosSearch
 import subprocess
 import os
+from dotenv import load_dotenv
+from pathlib import Path
+import requests
+import json
+import xmltodict
+load_dotenv(Path(".env"))
+weather_key = os.getenv("OPENDATA_GOV_KEY")
 # Mute alsa eror message for clean terminal output
 # Turn this off when debugging
 ERROR_HANDLER_FUNC = CFUNCTYPE(None, c_char_p, c_int, c_char_p, c_int, c_char_p)
@@ -42,6 +49,21 @@ def download_yt_audio(url):
                     "download.mp3"])
     assert os.path.isfile("download.mp3"), "download failed"
     return "download.mp3"
+
+def get_weather(city="台北市"):
+    # ref:https://ithelp.ithome.com.tw/articles/10276375
+    # this url is linked to current weather data
+    url = "https://opendata.cwb.gov.tw/fileapi/v1/opendataapi/O-A0003-001"
+    params = {
+        "Authorization": weather_key,
+        "locationName": city,
+    }
+
+    response = requests.get(url, params=params)
+    data = xmltodict.parse(response.text)
+    print(data.keys())
+
 if __name__=="__main__":
-    url = get_yt_url('never gonna give you up')
-    print(url)
+    # url = get_yt_url('never gonna give you up')
+    # print(url)
+    get_weather()

@@ -72,7 +72,7 @@ def listen_print_loop(responses):
 def main():
     # See http://g.co/cloud/speech/docs/languages
     # for a list of supported languages.
-    language_code = "en-US"  # a BCP-47 language tag
+    language_code = "zh-TW"  # a BCP-47 language tag
     #TODO change sample rate to interface's sample rate
     client = speech.SpeechClient()
     config = speech.RecognitionConfig(
@@ -86,6 +86,7 @@ def main():
     )
     stream = AudioInput(device=11, sample_rate=RATE, chunk_size=CHUNK)
     # stream.test_stream()
+    stream.listening = True
     start = time.time()
     while not stream.closed:
         samples = stream.generator()
@@ -94,7 +95,7 @@ def main():
             for content in samples
         )
         logging.debug("request parsed")
-        responses = client.streaming_recognize(streaming_config, requests)
+        responses = client.streaming_recognize(streaming_config, requests, timeout=3600)
         # Now, put the transcription responses to use.
         logging.debug("response generated")
         listen_print_loop(responses)

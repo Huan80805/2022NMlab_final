@@ -15,3 +15,4 @@ pafy=0.5.5
 #youtube dislike error
 #pip install git+https://github.com/Cupcakus/pafy
 youtube-search-python
+xmltodict
