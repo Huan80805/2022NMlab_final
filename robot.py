@@ -1,14 +1,13 @@
 from audio import AudioOutput
 from gtts import gTTS
 from chat import ChatBot
-import logging
-import time
 from asr import Hearing
 from player import Player
 from utils import get_yt_url, download_yt_audio
 from datetime import datetime
-from trt_pose_hand.client import get_gesture
-from youtubesearchpython import VideosSearch
+from trt_pose_hand.client_player import Client_Player
+from trt_pose_hand.client_camera import Client_Cam
+import threading
 import sys
 # # list audio devices
 # if args.list_devices:
@@ -55,6 +54,9 @@ class Robot():
                 'music': ['what song do you want play?','Searching on youtube and preparing to play'],
                 'stream': ['opening a live streaming on youtube'],
             }
+        #Open a thread to iteratively send cam data
+        client_cam = threading.Thread(target=Client_Cam)
+        client_cam.start()
         self.mode = 'HEARING'
         print('----------ROBOT IS NOW READY---------')
     
@@ -93,13 +95,19 @@ class Robot():
         player.start()
         # handle hand-pose tracking here
         # pan, stop, fist, peace
+        player_client = Client_Player()
+        player_client.init_conn()
         while not player.closed:
-            gesture = get_gesture()
-            print(gesture)
-            if KeyboardInterrupt:
+            try:
+                gesture = player_client.get_gesture()
+                print(gesture)
+                # do corresponding operations
+                # player.close()
+                # player.pause()
+                # player.volume = x 
+            except KeyboardInterrupt:
                 break
-            # do gesture-related operation
-        
+        player_client.end_conn()
         player.stop()
         self.out_stream = AudioOutput(device=self.out_device)
     

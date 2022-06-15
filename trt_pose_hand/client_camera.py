@@ -27,7 +27,7 @@ def camera():
     cap.release()
     return frame
 
-def get_gesture():
+def Client_cam():
     pipeline = (
         "nvarguscamerasrc ! "
             "video/x-raw(memory:NVMM), "
@@ -59,12 +59,8 @@ def get_gesture():
             s.send(frame)
 
             gesture = s.recv(1024)
-            print(gesture)
-            print(type(gesture))
-            if gesture != 'no hand' and False:
-                s.close()
-                cap.release()
-                return gesture
+            # print(gesture)
+            # print(type(gesture))
     except:
         s.close()
         cap.release()

@@ -81,7 +81,7 @@ class Hearing():
                 speech.StreamingRecognizeRequest(audio_content=content)
                 for content in samples
             )
-            responses = self.client.streaming_recognize(self.config, requests)
+            responses = self.client.streaming_recognize(self.config, requests, timeout=3600)
             # Now, put the transcription responses to use.
             transcript = listen_print_loop(responses)
             break

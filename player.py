@@ -39,23 +39,26 @@ class Player(threading.Thread):
         return (samples._data, pyaudio.paContinue)
 
     def run(self):
-        # Open an audio segment
-        self.closed = False
-        with mutealsa():
-            player = pyaudio.PyAudio()
-        stream = player.open(format = player.get_format_from_width(self.segment.sample_width),
-            channels = self.segment.channels,
-            rate = self.segment.frame_rate,
-            output_device_index = 11,
-            output = True,
-            frames_per_buffer=self.chunk_size,
-            stream_callback=self.callback)
+        try:
+            # Open an audio segment
+            self.closed = False
+            with mutealsa():
+                player = pyaudio.PyAudio()
+            stream = player.open(format = player.get_format_from_width(self.segment.sample_width),
+                channels = self.segment.channels,
+                rate = self.segment.frame_rate,
+                output_device_index = 11,
+                output = True,
+                frames_per_buffer=self.chunk_size,
+                stream_callback=self.callback)
 
-        stream.start_stream()
-        duration = self.segment.duration_seconds
-        while self.time <= duration*1000 and not self.closed:
-            continue
-        # automatically shut down once music ends
+            stream.start_stream()
+            duration = self.segment.duration_seconds
+            while self.time <= duration*1000 and not self.closed:
+                continue
+            # automatically shut down once music ends
+        except KeyboardInterrupt:
+            stream.close()
         stream.close()
 
     def play(self):
