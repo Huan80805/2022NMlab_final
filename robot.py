@@ -14,6 +14,8 @@ import sys
 # if args.list_devices:
 #     list_audio_devices()
 #     sys.exit()
+##########################################################
+from Weather import *
 
 class Robot():
     def __init__(self, asr_model="quartznet", mic='11', speaker='11', language='zh-TW'):
@@ -40,6 +42,7 @@ class Robot():
             self.response = {
                 'music': ['你想要播什麼歌', '正在網路上搜尋並準備播放'],
                 'stream': ['正在youtube上開啟直播'],
+                'weather': ['請問要查詢哪裡的天氣', '請稍後，正在為您查詢']
             }
         elif self.language == 'en-US':
             self.keyword = {
@@ -99,7 +102,14 @@ class Robot():
         
         player.stop()
         self.out_stream = AudioOutput(device=self.out_device)
-
+    
+    def get_weather(self):
+        self.speak(self.response['weather'][0])
+        city = self.hear()
+        print(f'___搜尋{city}___')
+        self.speak(self.response['weather'][1])
+        return search_weather(city)
+        
     def get_time(self):
         now = datetime.now()
         if self.language == 'zh-TW':
@@ -118,6 +128,10 @@ class Robot():
                 any(word in text.lower() for word in self.keyword['time'][1]):
                 current_time = self.get_time()
                 self.speak(current_time) 
+            # search weather mode
+            elif any(word in text.lower() for word in self.keyword['weather'][0]):
+                weather_ans = self.get_weather()
+                self.speak(weather_ans)
             # chat mode
             else:
                 response = self.chat(text)
