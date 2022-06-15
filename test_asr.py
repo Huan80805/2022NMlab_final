@@ -10,7 +10,7 @@ import time
 import logging
 from audio import AudioInput, list_audio_devices
 # Audio recording parameters
-RATE = 16000
+RATE = 44100
 CHUNK = int(RATE / 10)  # 100ms
 logging.getLogger().setLevel(logging.DEBUG)
 
@@ -85,7 +85,7 @@ def main():
         config=config, interim_results=True
     )
     stream = AudioInput(device=11, sample_rate=RATE, chunk_size=CHUNK)
-    # stream.test_stream()
+    #stream.test_stream()
     stream.listening = True
     start = time.time()
     while not stream.closed:

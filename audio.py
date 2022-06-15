@@ -60,6 +60,7 @@ class AudioInput:
             rate=self.sample_rate,
             input=True,
             frames_per_buffer=self.chunk_size,
+            input_device_index=self.device_id,
             # Run the audio stream asynchronously to fill the buffer object.
             # This is necessary so that the input device's buffer doesn't
             # overflow while the calling thread makes network requests, etc.
@@ -72,6 +73,7 @@ class AudioInput:
             self.closed = True
             raise ValueError(f"audio input device {self.device_id} couldn't be opened with sample_rate={self.sample_rate}")   
         print(f"\naudio stream opened on device {self.device_id} ({self.device_info['name']})")
+        print(f"with sample rate: {self.sample_rate}")
         print("you can begin speaking now... (press Ctrl+C to exit)\n")
     
     def _fill_buffer(self, in_data, frame_count, time_info, status_flags):

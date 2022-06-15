@@ -8,6 +8,8 @@ from player import Player
 from utils import get_yt_url, download_yt_audio
 from datetime import datetime
 from trt_pose_hand.client import get_gesture
+from youtubesearchpython import VideosSearch
+import sys
 # # list audio devices
 # if args.list_devices:
 #     list_audio_devices()
@@ -21,8 +23,8 @@ class Robot():
         # Move audio input stream into Hearing
         # supported language: https://cloud.google.com/speech-to-text/docs/languages
         self.hearing = Hearing(device=self.in_device, 
-                            sample_rate=16000, 
-                            chunk_size=int(16000/10),
+                            sample_rate=44100, 
+                            chunk_size=int(44100/10),
                             language=self.language)
         # self.out_stream is defined for chatbot only
         self.out_stream = AudioOutput(device=self.out_device)
@@ -91,6 +93,8 @@ class Robot():
         while not player.closed:
             gesture = get_gesture()
             print(gesture)
+            if KeyboardInterrupt:
+                break
             # do gesture-related operation
         
         player.stop()

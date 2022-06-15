@@ -53,9 +53,7 @@ def get_gesture():
             _, frame = cap.read()
             frame = frame[::-1, :, ::-1]
             frame = np.array( Image.fromarray(frame[:, 420:1500, :]).resize((224, 224)) )
-
             frame = pickle.dumps(frame)
-
             s.send(frame)
 
             gesture = s.recv(1024).decode()
