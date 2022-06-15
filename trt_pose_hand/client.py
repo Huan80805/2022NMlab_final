@@ -53,11 +53,15 @@ def get_gesture():
             _, frame = cap.read()
             frame = frame[::-1, :, ::-1]
             frame = np.array( Image.fromarray(frame[:, 420:1500, :]).resize((224, 224)) )
+
             frame = pickle.dumps(frame)
+
             s.send(frame)
 
-            gesture = s.recv(1024).decode()
-            if gesture != 'no hand':
+            gesture = s.recv(1024)
+            print(gesture)
+            print(type(gesture))
+            if gesture != 'no hand' and False:
                 s.close()
                 cap.release()
                 return gesture
@@ -98,7 +102,8 @@ if __name__ == '__main__':
             s.send(frame)
 
             Done = s.recv(1024)
-            if Done.decode() != 'Done':
+            print(Done.decode())
+            if Done.decode() != 'Done' and False:
                 s.close()
                 print('serer closed connection')
                 #break
