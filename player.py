@@ -33,6 +33,7 @@ class Player(threading.Thread):
         assert span/1000/frame_count*self.sample_rate == 1, "modify sample_rate and chunk_size or audio may be choppy"
         self.time += span
         while self.paused:
+            # when pausing not sending anything to outstream
             continue
         samples = self.segment[self.time: self.time+span] - (60 - (60 * (self.volume/100.0)))
         return (samples._data, pyaudio.paContinue)
@@ -54,6 +55,7 @@ class Player(threading.Thread):
         duration = self.segment.duration_seconds
         while self.time <= duration*1000 and not self.closed:
             continue
+        # automatically shut down once music ends
         stream.close()
 
     def play(self):

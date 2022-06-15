@@ -58,7 +58,7 @@ def get_gesture():
 
             s.send(frame)
 
-            gesture = s.recv(1024)
+            gesture = s.recv(1024).decode()
             if gesture != 'no hand':
                 s.close()
                 cap.release()

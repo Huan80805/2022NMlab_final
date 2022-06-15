@@ -7,6 +7,7 @@ from asr import Hearing
 from player import Player
 from utils import get_yt_url, download_yt_audio
 from datetime import datetime
+from trt_pose_hand.client import get_gesture
 # # list audio devices
 # if args.list_devices:
 #     list_audio_devices()
@@ -85,8 +86,13 @@ class Robot():
         player = Player(filepath=fp)
         # another thread
         player.start()
-        # enable hand-pose tracking here
-        time.sleep(60)
+        # handle hand-pose tracking here
+        # pan, stop, fist, peace
+        while not player.closed:
+            gesture = get_gesture()
+            print(gesture)
+            # do gesture-related operation
+        
         player.stop()
         self.out_stream = AudioOutput(device=self.out_device)
 

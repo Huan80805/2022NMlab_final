@@ -1,12 +1,12 @@
 from ctypes import *
 from contextlib import contextmanager
-from youtubesearchpython import VideosSearch
+import json
+# from youtubesearchpython import VideosSearch
 import subprocess
 import os
 from dotenv import load_dotenv
 from pathlib import Path
 import requests
-import json
 import xmltodict
 load_dotenv(Path(".env"))
 weather_key = os.getenv("OPENDATA_GOV_KEY")
@@ -50,18 +50,24 @@ def download_yt_audio(url):
     assert os.path.isfile("download.mp3"), "download failed"
     return "download.mp3"
 
-def get_weather(city="台北市"):
+def get_cur_location():
+    out = subprocess.check_output(['curl', 'ipinfo.io']).decode()
+    out = json.loads(out)
+    return out["city"]
+
+def get_weather():
     # ref:https://ithelp.ithome.com.tw/articles/10276375
     # this url is linked to current weather data
+    city = get_cur_location()
     url = "https://opendata.cwb.gov.tw/fileapi/v1/opendataapi/O-A0003-001"
     params = {
         "Authorization": weather_key,
         "locationName": city,
     }
-
     response = requests.get(url, params=params)
     data = xmltodict.parse(response.text)
-    print(data.keys())
+    print(data["cwbopendata"])
+
 
 if __name__=="__main__":
     # url = get_yt_url('never gonna give you up')
