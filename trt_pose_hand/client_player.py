@@ -2,6 +2,8 @@
 # request hand pose classification result from server
 import time
 import socket
+from .client_camera import Client_Cam
+from multiprocessing import Process
 class Client_Player():
     def __init__(self, host='140.112.18.210', port=12000):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -20,13 +22,15 @@ class Client_Player():
         print("ending request")
         
 if __name__ == "__main__":
-    client = Client_Player()
-    client.init_conn()
-    count = 0
+    # client_cam = Process(target=Client_Cam)
+    # client_cam.start()
+    client_player = Client_Player()
+    client_player.init_conn()
+    count = 20
     while count < 500:
         try:
-            gesture = client.get_gesture()
-            print(gesture)
+            gesture = client_player.get_gesture()
+            # print(gesture)
         except KeyboardInterrupt:
             break
-    client.end_conn()
+    client_player.end_conn()

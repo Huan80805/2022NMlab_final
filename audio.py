@@ -190,6 +190,7 @@ class AudioOutput:
             self.stream.stop_stream()
             self.stream.close()
             self.stream = None
+            self.interface.terminate()
        
     def write(self, samples):
         if self.device_id is None:

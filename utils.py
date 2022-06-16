@@ -1,6 +1,7 @@
 from ctypes import *
 from contextlib import contextmanager
 import json
+from time import time
 from youtubesearchpython import VideosSearch
 import subprocess
 import os
@@ -8,6 +9,7 @@ from dotenv import load_dotenv
 from pathlib import Path
 import requests
 import xmltodict
+import glob
 load_dotenv(Path(".env"))
 weather_key = os.getenv("OPENDATA_GOV_KEY")
 # Mute alsa eror message for clean terminal output
@@ -26,18 +28,22 @@ def mutealsa():
 def get_yt_url(name):
     videosSearch = VideosSearch(name)
     url = videosSearch.result()['result'][0]['id']
-    return f"https://www.youtube.com/watch?v={url}"
+    title = videosSearch.result()['result'][0]['title']
+    return f"https://www.youtube.com/watch?v={url}", title
 
 def download_yt_audio(url):
+    #mp3_cache is a dictionary mapping url to local mp3 file path
     assert isinstance(url, str)
     # Just call a command
     # Clean up cache
     try:
+        # os.remove(f'{len(mp3_cache)}.mp3')
         os.remove("download.mp3")
     except FileNotFoundError:
         pass
     #ba: select best audio quality
     #wa: worst
+    # filename = f'{len(mp3_cache)}.mp3'
     subprocess.call(["yt-dlp",
                     "-f",
                     "wa",
@@ -49,7 +55,6 @@ def download_yt_audio(url):
                     "download.mp3"])
     assert os.path.isfile("download.mp3"), "download failed"
     return "download.mp3"
-
 def get_cur_location():
     out = subprocess.check_output(['curl', 'ipinfo.io']).decode()
     out = json.loads(out)
@@ -69,7 +74,9 @@ def get_weather():
     print(data["cwbopendata"])
 
 
-if __name__=="__main__":
-    # url = get_yt_url('never gonna give you up')
-    # print(url)
-    get_weather()
+if __name__ == "__main__":
+    url, title = get_yt_url('忠明國小校歌')
+    print(url, title)
+    temp = {}
+    download_yt_audio(url,temp)
+    

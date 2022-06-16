@@ -1,0 +1,3 @@
+# run this command
+# mux live video with silent audio
+command = "gst-launch-1.0 nvarguscamerasrc ! 'video/x-raw(memory:NVMM), width=(int)640, height=(int)480,  format=(string)NV12, framerate=(fraction)10/1' ! queue ! omxh264enc ! 'video/x-h264, streamformat=(string)byte-stream' ! h264parse ! flvmux streamable=true name=mux ! rtmpsink location='rtmp://a.rtmp.youtube.com/live2/ht85-0chc-4r2g-fqth-3crz' audiotestsrc ! voaacenc bitrate=128000 ! mux."

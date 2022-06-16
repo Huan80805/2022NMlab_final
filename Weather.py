@@ -127,8 +127,23 @@ def search_weather(search_city):
     for elem in soup.find_all('td', class_=''):
         prob.append(elem.string)
 
-    i = city.index(search_city)
-    result = f'{city[i]}，{month_to_chi(date)}的天氣為攝氏{weather[i]}，氣溫為{temp_number_to_chinese(temp[i])}，降雨機率為{prob[i]}'
+    if "台" in search_city:
+        search_city = search_city.replace("台","臺")
+    max_count, max_i = -1, -1 
+    for eachcity in city:
+        count = 0
+        for word1 in eachcity:
+            for word2 in search_city:
+                if word1 == word2:
+                    count += 1
+        if count > max_count and count>=2:
+            max_count = count
+            max_i = city.index(eachcity)
+    i = max_i
+    if i==-1:
+        raise NotImplementedError
+    #i = city.index(search_city)
+    result = f'{city[i]}，{month_to_chi(date)}的天氣為{weather[i]}，氣溫為攝氏{temp_number_to_chinese(temp[i])}，降雨機率為{prob[i]}'
 
     return result
 
