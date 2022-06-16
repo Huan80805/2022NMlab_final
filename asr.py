@@ -6,7 +6,8 @@ os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "decent-lambda-352910-86fe91bb705
 import re
 from google.cloud import speech
 from audio import AudioInput
-
+import sys
+import time
 
 def listen_print_loop(responses):
     """Iterates through server responses and prints them.
@@ -24,6 +25,8 @@ def listen_print_loop(responses):
     final one, print a newline to preserve the finalized transcription.
     """
     num_chars_printed = 0
+    prev_transcript = ''
+    prev_time = time.time()
     for response in responses:
         if not response.results:
             continue
@@ -34,7 +37,6 @@ def listen_print_loop(responses):
         result = response.results[0]
         if not result.alternatives:
             continue
-
         # Display the transcription of the top alternative.
         transcript = result.alternatives[0].transcript
 
@@ -44,17 +46,16 @@ def listen_print_loop(responses):
         # If the previous result was longer than this one, we need to print
         # some extra spaces to overwrite the previous result
         overwrite_chars = " " * (num_chars_printed - len(transcript))
-
-        if not result.is_final:
-            num_chars_printed = len(transcript)
-        else:
+        print(f'[Inter] {transcript}', end='\r', flush=True)
+        if result.is_final:
+            print('\n')
+            print(f'[Final] {transcript}')
             return transcript
-            # Exit recognition if any of the transcribed phrases could be
-            # one of our keywords.
-            # if re.search(r"\b(exit|quit)\b", transcript, re.I):
-            #     print("Exiting..")
-            #     break
-
+        elif transcript == prev_transcript:
+            print('\n')
+            print(f'[Final] {transcript}')
+            return transcript
+        prev_transcript = transcript
 
 
 class Hearing():
@@ -68,11 +69,12 @@ class Hearing():
         config = speech.RecognitionConfig(
             encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
             sample_rate_hertz=sample_rate,
-            language_code=self.language_code,
+            language_code=self.language_code
         )
 
         self.config = speech.StreamingRecognitionConfig(
-            config=config, interim_results=True
+            config=config,
+            interim_results=True
         )
     def hear(self):
         while not self.stream.closed:
@@ -81,7 +83,7 @@ class Hearing():
                 speech.StreamingRecognizeRequest(audio_content=content)
                 for content in samples
             )
-            responses = self.client.streaming_recognize(self.config, requests, timeout=3600)
+            responses = self.client.streaming_recognize(self.config, requests)
             # Now, put the transcription responses to use.
             transcript = listen_print_loop(responses)
             break

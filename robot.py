@@ -1,3 +1,4 @@
+from logging import exception
 from audio import AudioOutput
 from gtts import gTTS
 from chat import ChatBot
@@ -77,11 +78,22 @@ class Robot():
         #TODO: set_language, enable users switching language
         #Redefine keyword, response, asr, tts, chat model?
         return
-    def hear(self):
+    def hear_loop(self):
         # Avoid Robot speaking while listening
+        # loop to escape timeout error
         self.hearing.stream.listening = True
         transcript = self.hearing.hear()
         self.hearing.stream.listening = False
+        return transcript
+    def hear(self):
+        transcript = None
+        while transcript == None:
+            try:
+                transcript = self.hear_loop()
+            except KeyboardInterrupt:
+                sys.exit()
+            # except:
+            #     transcript = None
         print(transcript)
         return transcript
     def speak(self, text):
@@ -93,21 +105,34 @@ class Robot():
         return self.chatbot.get_response_text(text=text)
 
     def play_song(self):
-        self.speak(self.response['music'][0])
+        mode = None
+        while mode == None:
+            self.speak("請選擇控制音樂的方式： 語音或手勢")
+            text = self.hear()
+            if "語音" in text:
+                self.speak("選擇用語音控制音樂"+self.response['music'][0])
+                mode = 'voice'
+            elif "手" in text or "首飾" in text: 
+                self.speak("選擇用手勢控制音樂"+self.response['music'][0])
+                mode = 'hand_pose'
+            else:
+                self.speak("目前只支持語音或手勢")
         text = self.hear()
-        # Rule-based just for now
         song = text.lower().split("play")[-1]
         url, title = get_yt_url(name=song)
         # Release out_stream
         # TODO, unify two out_stream?
+        # Download music
         try:
             p = Process(target=download_yt_audio, args=(url,))
             p.start()
             self.speak(self.response['music'][1]+song)
             self.speak(self.response['music'][2]+title)
             self.out_stream.close()
-            # time.sleep(5)
             p.join()
+        except:
+            self.speak(self.response['music'][4])
+        if mode == 'hand_pose':        
             # TODO, change filepath here by keyword
             player = Player(filepath="download.mp3")
             # another thread
@@ -138,9 +163,34 @@ class Robot():
             player_client.end_conn()
             player.stop()
             self.out_stream = AudioOutput(device=self.out_device)
-        except:
-            if not os.path.isfile("download.mp3"):
-                self.speak(self.response['music'][4])
+        else:
+            # TODO, change filepath here by keyword
+            player = Player(filepath="download.mp3")
+            # another thread
+            player.start()
+            while not player.closed:
+                try:
+                    text = self.hear()
+                    if "停止" in text:
+                        player.stop()
+                    if "暫停" in text and not player.paused:
+                        player.pause(True)
+                    elif ("播" in text or "放" in text) and player.paused:
+                        player.pause(False)
+                    elif "大" in text:
+                        player.volume = min(90, player.volume+10)
+                        print(player.volume)
+                    elif "小" in text:
+                        player.volume = max(50, player.volume-10)
+                        print(player.volume)
+                    else:
+                        pass
+                except KeyboardInterrupt:
+                    break
+            player.stop()
+            self.out_stream = AudioOutput(device=self.out_device)
+            
+
 
     
     def get_weather(self, city):
@@ -154,38 +204,42 @@ class Robot():
         return current_time
     def run(self):
         while True:
-            text = self.hear()
-            if self.on:
-                if self.keyword["on"][1] in text.lower():
-                    self.on = False
-                    self.speak(self.response['on'][1])
-                # playing music mode
-                elif any(word in text.lower() for word in self.keyword['music'][0]) and\
-                    any(word in text.lower() for word in self.keyword['music'][1]):
-                    self.play_song()
-                # Seach time mode
-                elif any(word in text.lower() for word in self.keyword['time'][0]) and\
-                    any(word in text.lower() for word in self.keyword['time'][1]):
-                    current_time = self.get_time()
-                    self.speak(current_time) 
-                # search weather mode
-                elif any(word in text.lower() for word in self.keyword['weather'][0]):
-                    self.speak(self.response['weather'][0])
-                    city = self.hear()
-                    self.speak(self.response['weather'][1])
-                    try:
-                        weather_ans = self.get_weather(city)
-                        self.speak(weather_ans)
-                    except:
-                        self.speak(f"找不到關於{city}的天氣")
-                # chat mode
+            try:
+                text = self.hear()
+                if self.on:
+                    if self.keyword["on"][1] in text.lower():
+                        self.on = False
+                        self.speak(self.response['on'][1])
+                    # playing music mode
+                    elif any(word in text.lower() for word in self.keyword['music'][0]) and\
+                        any(word in text.lower() for word in self.keyword['music'][1]):
+                        self.play_song()
+                    # Seach time mode
+                    elif any(word in text.lower() for word in self.keyword['time'][0]) and\
+                        any(word in text.lower() for word in self.keyword['time'][1]):
+                        current_time = self.get_time()
+                        self.speak(current_time) 
+                    # search weather mode
+                    elif self.keyword['weather'][0] in text.lower():
+                        self.speak(self.response['weather'][0])
+                        city = self.hear()
+                        self.speak(self.response['weather'][1])
+                        try:
+                            weather_ans = self.get_weather(city)
+                            self.speak(weather_ans)
+                        except:
+                            self.speak(f"找不到關於{city}的天氣")
+                    # chat mode
+                    else:
+                        response = self.chat(text)
+                        self.speak(response)
                 else:
-                    response = self.chat(text)
-                    self.speak(response)
-            else:
-                if self.keyword["on"][0] in text.lower():
-                    self.on = True
-                    self.speak(self.response['on'][0])
+                    if self.keyword["on"][0] in text.lower():
+                        self.on = True
+                        self.speak(self.response['on'][0])
+
+            except KeyboardInterrupt:
+                sys.exit()
                 
                 
 
