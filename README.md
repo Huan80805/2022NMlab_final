@@ -78,7 +78,7 @@ Finally you can start a robot, please modify robot.py with your device ids and r
 python3 robot.py
 ``` 
 ## Used Technology and Result Demo
-<div style="text-align:center"><img src='./img/architecture.png' height=250></div>
+<p align='center'><img src='./img/architecture.png' height=250></p>
 
 ### Demo
 https://www.youtube.com/watch?v=dH29B6pBTYY
@@ -102,6 +102,6 @@ Remark: Please make sure your hand is <font color='red'>enough far away and in t
 ### Search weather
 We provide a weather searching function in our chat robot. Using keyword "天氣" or "weather" to activate this service. After service activated success, robot will ask where does the user want to search the weather. Choose and speak the desire city name, robot will search and answer you. We use beautifulsoup4 and requests to do the web crawlering. The default target website is [新浪天氣](https://weather.sina.com.tw/tw_today.shtml).
 
-<div style="text-align:center"><img src='./img/Requests.png' height=150><img src='./img/BS4.png' height=150></div>
+<p align="center"><img src='./img/Requests.png' height=150><img src='./img/BS4.png' height=150></p>
 
 
