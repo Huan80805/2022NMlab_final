@@ -78,7 +78,7 @@ Finally you can start a robot, please modify robot.py with your device ids and r
 python3 robot.py
 ``` 
 ## Used Technology and Result Demo
-<p align='center'><img src='./img/architecture.png' height=250></p>
+<p align='center'><img src='./img/architecture.png' height=400></p>
 
 ### Demo
 https://www.youtube.com/watch?v=dH29B6pBTYY
