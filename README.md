@@ -80,6 +80,8 @@ python3 robot.py
 ## Used Technology and Result Demo
 <center><img src='./img/architecture.png' height=250></center>
 
+### Demo
+https://www.youtube.com/watch?v=dH29B6pBTYY
 ### Speech-to-speech interface
 We integrate speech-to-text, NLP model and text-to-speech cloud servies to provide users with an AI robot who can "chat" with users.
 ### Music player
