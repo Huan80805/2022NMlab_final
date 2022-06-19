@@ -1,7 +1,6 @@
 from ctypes import *
 from contextlib import contextmanager
 import json
-from time import time
 from youtubesearchpython import VideosSearch
 import subprocess
 import os
@@ -9,7 +8,8 @@ from dotenv import load_dotenv
 from pathlib import Path
 import requests
 import xmltodict
-import glob
+import time
+import logging
 load_dotenv(Path(".env"))
 weather_key = os.getenv("OPENDATA_GOV_KEY")
 # Mute alsa eror message for clean terminal output
@@ -27,9 +27,18 @@ def mutealsa():
 
 def get_yt_url(name):
     videosSearch = VideosSearch(name)
-    url = videosSearch.result()['result'][0]['id']
-    title = videosSearch.result()['result'][0]['title']
-    return f"https://www.youtube.com/watch?v={url}", title
+    print(videosSearch.result()['result'])
+    for r in videosSearch.result()['result']:
+        url = r['id']
+        title = r['title']
+        duration = r['duration'].split(':')
+        duration.reverse()
+
+        seconds = 0
+        for i in range(len(duration)):
+            seconds += int(duration[i])*(60**i)
+        if seconds <= 360:
+            return f"https://www.youtube.com/watch?v={url}", title
 
 def download_yt_audio(url):
     #mp3_cache is a dictionary mapping url to local mp3 file path
@@ -44,6 +53,7 @@ def download_yt_audio(url):
     #ba: select best audio quality
     #wa: worst
     # filename = f'{len(mp3_cache)}.mp3'
+    print('---------------downloading--------------------')
     subprocess.call(["yt-dlp",
                     "-f",
                     "wa",
@@ -75,8 +85,8 @@ def get_weather():
 
 
 if __name__ == "__main__":
-    url, title = get_yt_url('忠明國小校歌')
+    url, title = get_yt_url('PTT')
     print(url, title)
-    temp = {}
-    download_yt_audio(url,temp)
+    download_yt_audio(url)
+
     

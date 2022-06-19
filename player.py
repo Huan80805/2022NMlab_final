@@ -98,11 +98,9 @@ if __name__ == '__main__':
     # #test reopening outputstream
     # out_stream = AudioOutput(device='11')
 
-    url, title = get_yt_url('忠明國小校歌')
-    print(url, title)
-    temp = {}
-    download_yt_audio(url,temp)
-    player = Player(temp[url])
+    url, title = get_yt_url('PTT')
+    download_yt_audio(url)
+    player = Player("download.mp3")
     player.start()
     time.sleep(20)
     player.stop()

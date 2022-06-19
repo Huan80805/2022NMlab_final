@@ -9,17 +9,16 @@ from datetime import datetime
 from trt_pose_hand.client_player import Client_Player
 from trt_pose_hand.client_camera import Client_Cam
 from multiprocessing import Process
-import multiprocessing
 import time
 import sys
-import os
+import logging
 # # list audio devices
 # if args.list_devices:
 #     list_audio_devices()
 #     sys.exit()
 ##########################################################
 from Weather import search_weather
-
+# logging.getLogger().setLevel(logging.DEBUG)
 class Robot():
     def __init__(self, asr_model="quartznet", mic='11', speaker='11', language='zh-TW'):
         self.in_device = mic
@@ -40,7 +39,7 @@ class Robot():
                 'music': [['播','放'],['音樂']],
                 'stream': [['開'], ['直播']],
                 'weather': ['天氣'],
-                'time': [['現在'],['時間', '幾點']],
+                'time': ['現在','時間', '幾點'],
                 'on': ['開機','關機']
             }
             self.response = {
@@ -92,8 +91,8 @@ class Robot():
                 transcript = self.hear_loop()
             except KeyboardInterrupt:
                 sys.exit()
-            # except:
-            #     transcript = None
+            except:
+                transcript = None
         print(transcript)
         return transcript
     def speak(self, text):
@@ -106,8 +105,8 @@ class Robot():
 
     def play_song(self):
         mode = None
+        self.speak("請選擇控制音樂的方式： 語音或手勢")
         while mode == None:
-            self.speak("請選擇控制音樂的方式： 語音或手勢")
             text = self.hear()
             if "語音" in text:
                 self.speak("選擇用語音控制音樂"+self.response['music'][0])
@@ -130,6 +129,7 @@ class Robot():
             self.speak(self.response['music'][2]+title)
             self.out_stream.close()
             p.join()
+            print("finish downloading")
         except:
             self.speak(self.response['music'][4])
         if mode == 'hand_pose':        
@@ -168,6 +168,7 @@ class Robot():
             player = Player(filepath="download.mp3")
             # another thread
             player.start()
+            print("start playing")
             while not player.closed:
                 try:
                     text = self.hear()
@@ -198,7 +199,7 @@ class Robot():
     def get_time(self):
         now = datetime.now()
         if self.language == 'zh-TW':
-            current_time = now.strftime("%H點%M分%S秒")
+            current_time = now.strftime("現在是%H點%M分%S秒")
         else:
             current_time = now.strftime('%H O\'clock %M minute and %Seconds')
         return current_time
@@ -215,8 +216,7 @@ class Robot():
                         any(word in text.lower() for word in self.keyword['music'][1]):
                         self.play_song()
                     # Seach time mode
-                    elif any(word in text.lower() for word in self.keyword['time'][0]) and\
-                        any(word in text.lower() for word in self.keyword['time'][1]):
+                    elif any(word in text.lower() for word in self.keyword['time']):
                         current_time = self.get_time()
                         self.speak(current_time) 
                     # search weather mode
