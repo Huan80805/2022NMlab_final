@@ -10,7 +10,7 @@ from audio import AudioOutput
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--output-device", default=None, type=str, help='output audio device to use')
+parser.add_argument("--output_device", default=None, type=str, help='output audio device to use')
 args = parser.parse_args()
 print(args)
 gtts_sample_rate = 24000

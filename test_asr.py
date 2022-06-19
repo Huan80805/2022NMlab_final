@@ -9,6 +9,7 @@ from google.cloud import speech
 import time
 import logging
 from audio import AudioInput, list_audio_devices
+import argparse
 # Audio recording parameters
 RATE = 44100
 CHUNK = int(RATE / 10)  # 100ms
@@ -69,7 +70,8 @@ def listen_print_loop(responses):
             num_chars_printed = 0
 
 
-def main():
+def main(device_idx):
+
     # See http://g.co/cloud/speech/docs/languages
     # for a list of supported languages.
     language_code = "zh-TW"  # a BCP-47 language tag
@@ -84,7 +86,7 @@ def main():
     streaming_config = speech.StreamingRecognitionConfig(
         config=config, interim_results=True
     )
-    stream = AudioInput(device=11, sample_rate=RATE, chunk_size=CHUNK)
+    stream = AudioInput(device=device_idx, sample_rate=RATE, chunk_size=CHUNK)
     #stream.test_stream()
     stream.listening = True
     start = time.time()
@@ -102,5 +104,10 @@ def main():
 
 
 if __name__ == "__main__":
-    list_audio_devices()
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--list_audio_devices', action='store_true')
+    parser.add_argument("--input_device", default=None, type=str, help='input audio device to use')
+    args = parser.parse_args()
+    if args.list_audio_devices:
+        list_audio_devices()
+    main(args.input_device)

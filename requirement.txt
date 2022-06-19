@@ -3,16 +3,11 @@ openai==0.10.5
 gtts
 python-dotenv==0.20.0
 google-cloud-speech
-# sudo apt-get install portaudio19-dev
 pyaudio
-# sudo apt-get install llvm-9 llvm-9-dev
-# export LLVM_CONFIG=/usr/bin/llvm-config-9
 llvmlite
-# https://blog.csdn.net/Whale__a/article/details/114837594
 librosa
 pydub
 pafy=0.5.5
-#youtube dislike error
-#pip install git+https://github.com/Cupcakus/pafy
 youtube-search-python
 xmltodict
+yt-dlp

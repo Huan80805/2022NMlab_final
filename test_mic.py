@@ -1,6 +1,10 @@
 import pyaudio
 import wave
-
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument("--input_device", default=None, type=str, help='input audio device to use')
+args = parser.parse_args()
+print(args)
 CHUNK = 1024
 FORMAT = pyaudio.paInt16
 CHANNELS = 1
@@ -13,7 +17,7 @@ p = pyaudio.PyAudio()
 stream = p.open(format=FORMAT,
                 channels=CHANNELS,
                 rate=RATE,
-                input_device_index=11,
+                input_device_index=args.input_device,
                 input=True,
                 frames_per_buffer=CHUNK)
 
